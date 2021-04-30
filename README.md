@@ -19,7 +19,9 @@ Tree of this project
  /discoDocker
 
   +----- docker
+
          +---- Esse projeto.. Vagrant...
+
   +----- apache
 
          +---- conf
