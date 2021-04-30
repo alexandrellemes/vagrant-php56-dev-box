@@ -19,12 +19,15 @@ Tree of this project
  /discoDocker
 
   +----- docker
-
+         +---- Esse projeto.. Vagrant...
   +----- apache
 
          +---- conf
+               +--- meu.projeto.dev.conf
 
          +---- projetos
+     
+               +------ meu.projeto.dev
          
 
 vagrant ssh
