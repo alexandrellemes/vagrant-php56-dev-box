@@ -15,14 +15,22 @@ Installation
 * To activate a site:
 
 Tree of this project
-discoDocker
+
+ /discoDocker
+
   +----- docker
+
   +----- apache
+
          +---- conf
+
          +---- projetos
          
+
 vagrant ssh
+
 sudo docker-compose exec php-apache sh -c "a2ensite meu.site.desenv"
+
 sudo docker-compose exec php-apache sh -c "service apache2 reload"
 
 
