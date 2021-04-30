@@ -1,0 +1,294 @@
+version: '3.7'
+
+services:
+
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin:latest
+#    container_name: phpmyadmin
+#    ports:
+#      - 8000:80
+#    restart: always
+#    volumes:
+#      - /tmp:/tmp
+#    links:
+#      - mysqldb
+#    environment:
+#      MYSQL_USERNAME: root
+#      MYSQL_ROOT_PASSWORD: 123456
+#      PMA_HOST: mysqldb
+#    networks:
+#      - code-network
+
+# PHP - Apache - ambiente desenvolvimento.
+#  php-apache:
+#    container_name: php-apache
+#    restart: always
+#    build:
+#      context: ./files/php-apache
+#      args:
+#        URL_PROXY: ${URL_PROXY}
+#        PHP_VERSION: ${PHP_VERSION}
+#        HOME: ${HOME_DIR}
+#    volumes:
+#      - ${HOME_DIR}/discoDocker/apache/projetos/:/var/www/html/
+#      - ${HOME_DIR}/discoDocker/apache/conf/:/etc/apache2/sites-available/
+#      - ${HOME_DIR}/discoDocker/dados/:/dados/
+#    #      - ${HOME_DIR}/discoDocker/apache/logs/:/var/log/apache2
+#      - /tmp:/tmp
+#    ports:
+#      - 80:80
+#      - 443:443
+#    links:
+#      - mysqldb
+#      - memcached
+#    networks:
+#      - code-network
+
+  php-apache:
+    container_name: php-apache
+    restart: always
+    build:
+      context: ./files/php-5.6-apache
+      args:
+        URL_PROXY: ${URL_PROXY}
+        PHP_VERSION: 5.6
+        HOME: ${HOME_DIR}
+    volumes:
+      - ${HOME_DIR}/discoDocker/apache/projetos/:/var/www/html/
+      - ${HOME_DIR}/discoDocker/apache/conf/:/etc/apache2/sites-available/
+      - ${HOME_DIR}/discoDocker/dados/:/dados/
+      #      - ${HOME_DIR}/discoDocker/apache/logs/:/var/log/apache2
+      - /tmp:/tmp
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - mysqldb
+      - memcached
+    extra_hosts:
+      - "localhost : 127.0.0.1"
+      - "seides.intra.goias.gov.br : 127.0.0.1"
+      - "exa01-scan7.intra.goias.gov.br : 10.6.219.75"
+      - "appseidessolr01.intra.goias.gov.br : 10.6.1.175"
+    networks:
+      - code-network
+
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:latest
+    restart: always
+    command: ['mysqld', '--lower_case_table_names=0', '--default_authentication_plugin=mysql_native_password']
+    volumes:
+      - mysqldb_data:/var/lib/mysql
+      - /tmp:/tmp
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: '123456'
+      MYSQL_DATABASE: 'testdb'
+    networks:
+      - code-network
+
+  memcached:
+    container_name: memcached
+    restart: always
+    image: memcached:latest
+    ports:
+      - 11211:11211
+    networks:
+      - code-network
+
+#  Gerenciador de Container.
+  portainer:
+    image: portainer/portainer
+    ports:
+      - 9000:9000
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - code-network
+
+  # SMTP Server - desenvolvimento. (MailHog)
+  mail:
+    container_name: mail.llemes.local
+    hostname: mail.llemes.local
+    domainname: llemes.local
+    restart: always
+    build:
+      context: ./files/mailhog
+      args:
+        URL_PROXY: ${URL_PROXY}
+        PHP_VERSION: ${PHP_VERSION}
+        HOME: ${HOME_DIR}
+    volumes:
+    # - ${HOME_DIR}/discoDocker/docker/mail/:/var/mail/
+      - /tmp:/tmp
+    ports:
+      - 1025:1025
+      - 1080:8025
+    networks:
+      - code-network
+
+# SMTP Server - desenvolvimento. (MailDev)
+#  mail:
+#    container_name: mail.llemes.local
+#    image: maildev/maildev
+#    restart: always
+#    hostname: mail.llemes.local
+#    domainname: llemes.local
+#    command: node bin/maildev --web 80 --smtp 25
+#    environment:
+#      - HTTP_PORT=yes
+#      - SMTP_PORT=yes
+#      - VERBOSE=yes
+#      - NODE_ENV=production
+#    ports:
+#      - 25:25
+#      - 1080:80
+#    networks:
+#      - code-network
+
+#  mail:
+#    container_name: mail.llemes.local
+#    restart: always
+#    image: iredmail/mariadb:nightly
+#    hostname: mail.llemes.local
+#    domainname: llemes.local
+#    environment:
+#      - HOSTNAME=mail.llemes.local
+#      - DOMAIN=llemes.local
+#      - MYSQL_ROOT_PASSWORD=123456
+#      - SOGO_WORKERS=1
+#      - TIMEZONE=America/Sao_Paulo
+#      - POSTMASTER_PASSWORD=123456
+#      - IREDAPD_PLUGINS=['reject_null_sender', 'reject_sender_login_mismatch', 'greylisting', 'throttle', 'amavisd_wblist', 'sql_alias_access_policy']
+#      - FIRST_MAIL_DOMAIN=llemes.local
+#      - FIRST_MAIL_DOMAIN_ADMIN_PASSWORD=123456
+#      - MLMMJADMIN_API_TOKEN=YEnm0as64mpubRd/kV7KJwt0/btMXVKlAva69/wSRO4=
+#      - ROUNDCUBE_DES_KEY=cWUf55NzvFJm5CiuR/HzCfEeTDeewiyV
+#    ports:
+#      - 25:25
+#      - 1080:80
+#      - 110:110
+#      - 143:143
+#      - 443:443
+#      - 587:587
+#      - 993:993
+#      - 995:995
+#    volumes:
+#      - iredmail_backup:/var/vmail/backup
+#      - iredmail_mailboxes:/var/vmail/vmail1
+#      - iredmail_mlmmj:/var/vmail/mlmmj
+#      - iredmail_mlmmj_archive:/var/vmail/mlmmj-archive
+#      - iredmail_imapsieve_copy:/var/vmail/imapsieve_copy
+#      - iredmail_custom:/opt/iredmail/custom
+#      - iredmail_ssl:/opt/iredmail/ssl
+#      - iredmail_mysql:/var/lib/mysql
+#      - iredmail_clamav:/var/lib/clamav
+#      - iredmail_sa_rules:/var/lib/spamassassin
+#      - iredmail_postfix_queue:/var/spool/postfix
+#    networks:
+#      - code-network
+
+#  oracledb:
+#    container_name: oracledb
+#    #     image: wnameless/oracle-xe-11g
+#    image: epiclabs/docker-oracle-xe-11g
+#    ports:
+#      - "1521:1521"
+#    networks:
+#      - code-network
+
+#  postgresdb:
+#    container_name: postgresdb
+#    image: postgres
+#    restart: always
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_PASSWORD: 123456
+#    networks:
+#      - code-network
+
+#  sonarqube:
+#    container_name: sonarqube
+#    image: sonarqube
+#    restart: always
+#    ports:
+#      - 7004:9000
+#      - 7005:9092
+#    networks:
+#      - code-network
+
+# ELK Stack (Elasticsearch, Logstash e Kibana)
+#  elk:
+#    image: sebp/elk
+#    ports:
+#      - 5601:5601
+#      - 9200:9200
+#      - 5400:5400
+
+#  db:
+#    container_name: db
+#    image: postgres
+#    restart: always
+#    environment:
+#      POSTGRES_DB: virtula
+#      POSTGRES_USER: virtula
+#      POSTGRES_PASSWORD: virtulasystem
+#    ports:
+#      - 5432:5432
+#    networks:
+#      - code-network
+
+#  web:
+#    container_name: web
+#    restart: always
+#    build:
+#      context: ./files/ruby
+#      args:
+#        URL_PROXY: ${URL_PROXY}
+#        PHP_VERSION: ${PHP_VERSION}
+#        HOME: ${HOME_DIR}
+#    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+#    volumes:
+#      - ${HOME_DIR}/discoDocker/rubyOnRails/vitula-master/:/myapp/
+#      - /tmp:/tmp
+#    ports:
+#      - 3000:3000
+#    depends_on:
+#      - db
+#    networks:
+#      - code-network
+
+volumes:
+    phpmyadmin_data:
+    php-apache_data:
+    mysqldb_data:
+    memcached_data:
+    portainer_data:
+    maillocal_data:
+    oracledb_data:
+    postgresdb_data:
+    sonarqube_data:
+    iredmail_backup:
+    iredmail_mailboxes:
+    iredmail_mlmmj:
+    iredmail_mlmmj_archive:
+    iredmail_imapsieve_copy:
+    iredmail_custom:
+    iredmail_ssl:
+    iredmail_mysql:
+    iredmail_clamav:
+    iredmail_sa_rules:
+    iredmail_postfix_queue:
+
+networks:
+    code-network:
+      driver: bridge
+
+
