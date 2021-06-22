@@ -18,7 +18,7 @@ echo 'Desabilita o site default'
 sudo docker-compose exec php-apache sh -c "a2dissite 000-default"
 
 #echo 'Habilita o site de desenvolvimento'
-#sudo docker-compose exec php-apache sh -c "a2ensite xxxxxxx.xxx.xxx.gxxx.xx"
+sudo docker-compose exec php-apache sh -c "a2ensite meusite.local"
 
 echo 'Reinicia o apache2'
 sudo docker-compose exec php-apache sh -c "service apache2 reload"

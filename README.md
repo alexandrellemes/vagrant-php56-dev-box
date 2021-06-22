@@ -8,7 +8,7 @@ Installation
 ------------
 
 * Install vagrant using the installation instructions in the [Getting Started document](http://vagrantup.com/v1/docs/getting-started/index.html)
-* Add a Ubuntu Precise box using the [available official boxes](https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Boxes), for example: ```vagrant box add precise64 http://files.vagrantup.com/precise64.box```
+
 * Clone this repository
 * After running ```vagrant up``` 
 
@@ -16,7 +16,10 @@ Installation
 
 Tree of this project
 
- /discoDocker
+
+/vagrant-php56-dev-box
+     
+          /discoDocker
 
   +----- docker
 
