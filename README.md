@@ -14,34 +14,36 @@ Installation
 
 * To activate a site:
 
-Tree of this project
+1. Create a configuration file of your site (virtualhost) on the path: discoDocker/apache/conf.
+2. Activate your site:
 
+$ vagrant ssh
 
-/vagrant-php56-dev-box
-     
-          /discoDocker
+$ sudo docker-compose exec php-apache sh -c "a2ensite meu.site"
 
-  +----- docker
+$ sudo docker-compose exec php-apache sh -c "service apache2 reload"
 
-         +---- Esse projeto.. Vagrant...
+3. Change your local file hosts:
+    - Windows: 
+      - \Windows\System32\drivers\etc\hosts
+    - Linux: 
+      - /etc/hosts   
 
-  +----- apache
+4. Access by browser your application.
 
-         +---- conf
-               +--- meu.projeto.dev.conf
+This scripts contains:
+  - info.php
+    - Information abou your Apache Server.
+    
+  - mysqltest.php
+    - A brief test on your MySQL Server.
+    
+  - oracletest.php
+    - A brief test on you Oracle Server.
 
-         +---- projetos
-     
-               +------ meu.projeto.dev
-         
-
-vagrant ssh
-
-sudo docker-compose exec php-apache sh -c "a2ensite meu.site.desenv"
-
-sudo docker-compose exec php-apache sh -c "service apache2 reload"
-
-
+  - postgrestest.php
+    - A brief test on your PostGreSQL Server.
+    
 Installed components
 --------------------
 
